@@ -1,0 +1,15 @@
+{
+  "name": "samplebackendproject",
+  "version": "1.0.0",
+  "description": "A backend sample project",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "author": "Ayush Mazumdar",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
