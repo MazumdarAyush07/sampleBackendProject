@@ -95,9 +95,15 @@ const updateTweet = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid Tweet ID");
   }
 
+  const tweet = await Tweet.findById(tweetId);
+
+  if (req.user?._id.toString() != tweet?.owner.toString()) {
+    throw new ApiError(401, "You are not authorized to perform this action");
+  }
+
   const { content } = req.body;
 
-  const tweet = await Tweet.findByIdAndUpdate(
+  tweet = await Tweet.findByIdAndUpdate(
     tweetId,
     {
       $set: {
@@ -127,6 +133,12 @@ const deleteTweet = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
   if (!tweetId || !Types.ObjectId.isValid(tweetId)) {
     throw new ApiError(400, "Invalid Tweet Id");
+  }
+
+  const tweet = await Tweet.findById(tweetId);
+
+  if (req.user?._id.toString() != tweet?.owner.toString()) {
+    throw new ApiError(401, "You are not authorized to perform this action");
   }
 
   await Tweet.findByIdAndDelete(tweetId);
