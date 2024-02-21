@@ -1,5 +1,6 @@
 import mongoose, { Types, isValidObjectId } from "mongoose";
 import { Tweet } from "../models/tweet.models.js";
+import { Like } from "../models/like.models.js";
 import { User } from "../models/user.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -45,26 +46,76 @@ const getUserTweets = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid User ID");
   }
 
-  const user = await User.findById(Types.ObjectId.createFromHexString(userId));
-
-  if (!user) {
-    throw new ApiError(404, "No such user found");
-  }
   const tweets = await Tweet.aggregate([
     {
       $match: {
-        owner: Types.ObjectId.createFromHexString(userId),
+        owner: new mongoose.Types.ObjectId(userId),
+      },
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "tweet",
+        as: "tweetLikedBy",
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        content: { $first: "$content" },
+        owner: { $first: "$owner" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        totalTweetLikes: { $sum: { $size: "$tweetLikedBy" } },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  if (!tweets?.length) {
+    throw new ApiError(404, "Tweet does not exist");
+  }
+
+  const tweetBy = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(userId),
+      },
+    },
+    {
+      $addFields: {
+        isTweetOwner: {
+          $cond: {
+            if: { $eq: [req.user?._id.toString(), userId] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        username: 1,
+        fullName: 1,
+        avatar: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        isTweetOwner: 1,
       },
     },
   ]);
 
-  if (!tweets) {
-    throw new ApiError(500, "There was a problem fetching the tweet");
-  }
+  const tweetAndDetails = {
+    tweets,
+    tweetBy,
+  };
 
   return res
     .status(200)
-    .json(new ApiResponse(200, tweets, "All tweets fetched successfully"));
+    .json(
+      new ApiResponse(200, tweetAndDetails, "All tweets fetched successfully")
+    );
 });
 
 const getTweet = asyncHandler(async (req, res) => {
@@ -73,11 +124,32 @@ const getTweet = asyncHandler(async (req, res) => {
   if (!tweetId || !Types.ObjectId.isValid(tweetId)) {
     throw new ApiError(400, "Invalid Tweet Id");
   }
+  const tweet = await Tweet.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(tweetId),
+      },
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "tweet",
+        as: "tweetLikedBy",
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        content: { $first: "$content" },
+        owner: { $first: "$owner" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        totalTweetLikes: { $sum: { $size: "$tweetLikedBy" } },
+      },
+    },
+  ]);
 
-  const tweet = await Tweet.findById(tweetId);
-  if (!tweet) {
-    throw new ApiError(404, "Tweet not found");
-  }
   return res.status(200).json(new ApiResponse(200, tweet, "Tweet fetched"));
 });
 
@@ -128,6 +200,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
   Get the tweet id
   check the validity.
   Delete the tweet
+  Delete the likes
   return response
   */
   const { tweetId } = req.params;
@@ -142,6 +215,8 @@ const deleteTweet = asyncHandler(async (req, res) => {
   }
 
   await Tweet.findByIdAndDelete(tweetId);
+  await Like.deleteMany({ tweet: tweet._id });
+
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "The tweet was deleted successfully!"));
