@@ -43,6 +43,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
   */
   const { userId } = req.params;
   if (!userId || !Types.ObjectId.isValid(userId)) {
+    console.log(userId);
     throw new ApiError(400, "Invalid User ID");
   }
 
