@@ -80,7 +80,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
                 {
                   $project: {
                     username: 1,
-                    fullname: 1,
+                    fullName: 1,
                     avatar: 1,
                     createdAt: 1,
                     updated: 1,
@@ -113,7 +113,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
   const { subscriberId } = req.params;
-  if (!subscriberId) {
+  if (!subscriberId || !Types.ObjectId.isValid(subscriberId)) {
     console.log(subscriberId);
     throw new ApiError(400, "Invalid User ID");
   }
@@ -141,7 +141,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
                 {
                   $project: {
                     username: 1,
-                    fullname: 1,
+                    fullName: 1,
                     avatar: 1,
                     createdAt: 1,
                     updatedAt: 1,
