@@ -1,5 +1,5 @@
 import mongoose, { isValidObjectId } from "mongoose";
-import { Like } from "../models/like.model.js";
+import { Like } from "../models/like.models.js";
 import { Video } from "../models/video.models.js";
 import { Comment } from "../models/comment.models.js";
 import { Tweet } from "../models/tweet.models.js";
@@ -93,7 +93,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 const toggleTweetLike = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
   //TODO: toggle like on tweet
-  if (!tweetId || isValidObjectId(tweetId)) {
+  if (!tweetId || !isValidObjectId(tweetId)) {
     throw new ApiError(400, "Invalid Tweet ID");
   }
 

@@ -1,0 +1,16 @@
+Models
+    Users(done)
+    subscriptions(done)
+    tweets(done)
+    comments(done)
+    playlists
+    likes(done)
+    videos(done)
+Controllers
+    Users(done)
+    subscriptions(done)
+    tweets(done)
+    comments(done)
+    playlists
+    likes(done)
+    videos(done)
