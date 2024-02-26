@@ -61,7 +61,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        likeByUser: {
+        likedByUser: {
           $in: [req.user?._id, "$totalLikesOnComment.likedBy"],
         },
       },
@@ -74,7 +74,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
         owner: { $first: "$owner" },
         createdAt: { $first: "$createdAt" },
         updatedAt: { $first: "$updatedAt" },
-        totalLikeOnComment: { $sum: { $size: "$totalLikesOnComment" } },
+        totalLikesOnComment: { $sum: { $size: "$totalLikesOnComment" } },
         likedByUser: { $first: "$likedByUser" },
       },
     },
@@ -85,7 +85,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
         },
         isOwner: {
           $cond: {
-            if: { $eq: [req.user?._id, { $arrayElemAt: ["$onwer._id", 0] }] },
+            if: { $eq: [req.user?._id, { $arrayElemAt: ["$owner._id", 0] }] },
             then: true,
             else: false,
           },
