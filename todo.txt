@@ -3,7 +3,7 @@ Models
     subscriptions(done)
     tweets(done)
     comments(done)
-    playlists
+    playlists(done)
     likes(done)
     videos(done)
 Controllers
@@ -11,6 +11,7 @@ Controllers
     subscriptions(done)
     tweets(done)
     comments(done)
-    playlists
+    playlists(done)
     likes(done)
     videos(done)
+    dashboard(done)
