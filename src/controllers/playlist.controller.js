@@ -25,13 +25,13 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
   const createdPlaylist = await Playlist.findById(playlist._id);
 
-  if (!createPlaylist) {
+  if (!createdPlaylist) {
     throw new ApiError(500, "Something went wrong while creating the playlist");
   }
   return res
     .status(200)
     .json(
-      new ApiResponse(200, createPlaylist, "Playlist created successfully")
+      new ApiResponse(200, createdPlaylist, "Playlist created successfully")
     );
   //TODO: create playlist
 });
@@ -56,7 +56,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  if (!userPlaylist?.length()) {
+  if (!userPlaylist?.length) {
     throw new ApiError(404, "This user does not have any playlists");
   }
 
@@ -89,7 +89,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
         from: "user",
         localField: "owner",
         foreignField: "_id",
-        as: owner,
+        as: "owner",
         pipeline: [
           {
             $project: {
@@ -296,13 +296,13 @@ const updatePlaylist = asyncHandler(async (req, res) => {
     },
     { new: true }
   );
-  if (!updatePlaylist) {
+  if (!updatedPlaylist) {
     throw new ApiError(500, "Unable to update playlist");
   }
   return res
     .status(201)
     .json(
-      new ApiResponse(200, updatePlaylist, "Playlist updated successfully")
+      new ApiResponse(200, updatedPlaylist, "Playlist updated successfully")
     );
   //TODO: update playlist
 });

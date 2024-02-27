@@ -14,17 +14,17 @@ const router = Router();
 
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/").post(createPlaylist);
+router.route("/").post(createPlaylist); //tested successfully
 
 router
   .route("/:playlistId")
-  .get(getPlaylistById)
-  .patch(updatePlaylist)
-  .delete(deletePlaylist);
+  .get(getPlaylistById) //tested successfully
+  .patch(updatePlaylist) //tested successfully
+  .delete(deletePlaylist); //tested successfully
 
-router.route("/add/:videoId/:playlistId").patch(addVideoToPlaylist);
-router.route("/remove/:videoId/:playlistId").patch(removeVideoFromPlaylist);
+router.route("/add/:videoId/:playlistId").patch(addVideoToPlaylist); //tested successfully
+router.route("/remove/:videoId/:playlistId").patch(removeVideoFromPlaylist); //tested successfully
 
-router.route("/user/:userId").get(getUserPlaylists);
+router.route("/user/:userId").get(getUserPlaylists); //tested successfully
 
 export default router;
